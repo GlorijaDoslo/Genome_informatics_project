@@ -40,8 +40,8 @@ def suffix_array_optimized(suffix_array, suffix_array_checkpoint=1):
 
     return suffix_array_opt
 
-# returns positions of characters in first column
-def find_character_position_in_first(bwt_string, pattern, tots, tally, tally_checkpoint=1):
+# returns position of pattern in first column
+def find_pattern_position_in_first(bwt_string, pattern, tots, tally_checkpoint=1):
     if not pattern or tally_checkpoint < 0:
         print("No pattern or invalid value for tally checkpoint (must be >= 1).")
         return
@@ -51,13 +51,15 @@ def find_character_position_in_first(bwt_string, pattern, tots, tally, tally_che
     if pattern[-1] not in first_col:
         print("Pattern not found.")
         return
+
+    tally = create_tally(bwt_string, tally_checkpoint)
     
     lower_index_ex, upper_index_incl = first_col[pattern[-1]]
     pattern_index = len(pattern) - 2
 
     lower_index_ex = lower_index_ex - 1
     upper_index_incl = upper_index_incl - 1
-    
+
     for i in range(pattern_index, -1, -1):
         char_to_find = pattern[i]
 
@@ -102,7 +104,7 @@ def find_occurrences_to_the_checkpoint(bwt_string, limit_index, char_to_find, ta
 
 
 
-def create_tally(bwt_string, checkpoint_len):
+def create_tally(bwt_string, tally_checkpoint):
     char_occurrences = {}
     tally = {}
 
@@ -120,12 +122,12 @@ def create_tally(bwt_string, checkpoint_len):
     for index, char in enumerate(bwt_string):
         if char != '$':
             char_occurrences[char] += 1
-            if index % checkpoint_len == 0:    
+            if index % tally_checkpoint == 0:    
                 for char in tally.keys():
                     tally[char].append(char_occurrences[char])
         elif char == '$':
             # if char is $, add occurrences row for it
-            if index % checkpoint_len == 0:
+            if index % tally_checkpoint == 0:
                 for char in tally.keys():
                     tally[char].append(char_occurrences[char])
     
