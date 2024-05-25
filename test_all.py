@@ -83,15 +83,15 @@ def test_search_fm_index():
 
 
 
-Execute tests
-test_bwt_transform()
-test_construct_fm_index()
-test_search_fm_index()
+# Execute tests
+# test_bwt_transform()
+# test_construct_fm_index()
+# test_search_fm_index()
 
 
 
-bwt_transform, construct_fm_index, search_fm_index - added tests
-count_num_of_characters_in_bwt_string, get_starting_positions_of_characters, create_occurrence_table, indexed_search_using_fm_index
+# bwt_transform, construct_fm_index, search_fm_index - added tests
+# count_num_of_characters_in_bwt_string, get_starting_positions_of_characters, create_occurrence_table, indexed_search_using_fm_index
 
 
 
@@ -121,7 +121,7 @@ def test_char_position_in_first_col():
     bwt_1 = "annb$aa"
     pattern_1 = "ana"
     tots_1 = {'a': 3, 'n': 2, 'b': 1, '$': 1}
-    expected_result_1 = (2, 3)
+    expected_result_1 = [2, 3]
 
     result_1 = find_pattern_position_in_first(bwt_1, pattern_1, tots_1, 3)
     assert result_1 == expected_result_1, f"Test 1 failed. Expected: {expected_result_1}, Got: {result_1}"
@@ -131,7 +131,7 @@ def test_char_position_in_first_col():
     bwt_2 = "ipssm$pissii"
     pattern_2 = "ipp"
     tots_2 = {'i': 4, 'p': 2, 's': 4, 'm': 1, '$': 1}
-    expected_result_2 = (2, 2)
+    expected_result_2 = [2, 2]
 
     result_2 = find_pattern_position_in_first(bwt_2, pattern_2, tots_2, 3)
     assert result_2 == expected_result_2, f"Test 2 failed. Expected: {expected_result_2}, Got: {result_2}"
@@ -162,7 +162,7 @@ def test_fm_search_optimized():
     pattern_1 = "ana"
     tots_1 = {'a': 3, 'n': 2, 'b': 1, '$': 1}
     ranks_1 = [0, 0, 1, 0, 0, 1, 2]
-    first_col_positions_1 = (2, 3)
+    first_col_positions_1 = [2, 3]
     suffix_array_1 = [6, 5, 3, 1, 0, 4, 2]
     suffix_array_checkpoint_1 = 2
     expected_result_1 = [3, 1]
@@ -176,7 +176,7 @@ def test_fm_search_optimized():
     pattern_2 = "ipp"
     tots_2 = {'i': 4, 'p': 2, 's': 4, 'm': 1, '$': 1}
     ranks_2 = [0, 0, 0, 1, 0, 0, 1, 1, 2, 3, 2, 3]
-    first_col_positions_2 = (2, 2)
+    first_col_positions_2 = [2, 2]
     suffix_array_2 = [11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]
     suffix_array_checkpoint_2 = 3
     expected_result_2 = [7]

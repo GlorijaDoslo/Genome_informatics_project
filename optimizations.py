@@ -44,13 +44,13 @@ def suffix_array_optimized(suffix_array, suffix_array_checkpoint=1):
 def find_pattern_position_in_first(bwt_string, pattern, tots, tally_checkpoint=1):
     if not pattern or tally_checkpoint < 0:
         print("No pattern or invalid value for tally checkpoint (must be >= 1).")
-        return
+        return []
     
     first_col = first_column(tots)
 
     if pattern[-1] not in first_col:
         print("Pattern not found.")
-        return
+        return []
 
     tally = create_tally(bwt_string, tally_checkpoint)
     
@@ -80,14 +80,14 @@ def find_pattern_position_in_first(bwt_string, pattern, tots, tally_checkpoint=1
         char_occurences_num = upper_rank - lower_rank
         if char_occurences_num == 0:
             print("Pattern not found.")
-            return
+            return []
 
         # since ranks are found for last column, we search it in the first column, so
         # we need to set lower_index_ex and upper_index_incl to correspond the char in the first column
         lower_index_ex = first_col[char_to_find][0] + lower_rank - 1
         upper_index_incl = first_col[char_to_find][0] + lower_rank + char_occurences_num - 1
 
-    return lower_index_ex + 1, upper_index_incl
+    return [lower_index_ex + 1, upper_index_incl]
 
 
 # calculate how much char_to_find characters are found in the way to the checkpoint
