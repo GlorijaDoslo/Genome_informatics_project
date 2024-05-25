@@ -1,93 +1,97 @@
-from burrowsWheeler import bwt_transform, construct_fm_index, search_fm_index
+from burrowsWheeler import bwt, first_column, index_search, rank_bwt
+from constants import ALPHABET_SIZE, L_TYPE, S_TYPE
+from sa_is_algorithm import induce_sort, lms_substrings_are_equal, suffix_array
 
-def test_bwt_transform():
+# Tests for methods from BurrowsWheeler.py
+
+def test_bwt():
+    assert bwt("banana", [6, 5, 3, 1, 0, 4, 2]) == "annb$aa"
+    assert bwt("mississippi", [11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]) == "ipssm$pissii"
+    assert bwt("abc", [3, 0, 1, 2]) == "c$ab"
+
+def test_index_search():
+    bwt_str = "ipssm$pissii"
+    suffix_array = [11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]
+    ranks, tots = rank_bwt(bwt_str)
+    assert index_search(bwt_str, "ssi", suffix_array, ranks, tots) == [5, 2]
+    assert index_search(bwt_str, "ip", suffix_array, ranks, tots) == [7]
+    assert index_search(bwt_str, "is", suffix_array, ranks, tots) == [4, 1]
+
+def test_first_column():
+    counts = {'a': 3, 'b': 1, 'c': 2}
+    assert first_column(counts) == {'a': (0, 3), 'b': (3, 4), 'c': (4, 6)}
+    counts = {'a': 0, 'b': 0, 'c': 0}
+    assert first_column(counts) == {'a': (0, 0), 'b': (0, 0), 'c': (0, 0)}
+
+def test_rank_bwt():
+    assert rank_bwt("annb$aa") == ([0, 0, 1, 0, 0, 1, 2], {'a': 3, 'n': 2, 'b': 1, '$': 1})
+    assert rank_bwt("ipssm$pissii") == ([0, 0, 0, 1, 0, 0, 1, 1, 2, 3, 2, 3], {'i': 4, 'p': 2, 's': 4, 'm': 1, '$': 1})
+
+
+# Tests for methods from sa_is_algorithm.py
+
+def test_suffix_array():
+    assert suffix_array("banana") == [6, 5, 3, 1, 0, 4, 2]
+    assert suffix_array("") == [0]
+    assert suffix_array("a!*ba*?") == [7, 1, 5, 2, 6, 0, 4, 3]
+    assert suffix_array("Lorem ipsum dolor sit amet, consectetur adipiscing elit.") == [56, 39, 21, 27, 11, 50, 5, 17, 26, 55, 0, 40, 22, 46, 28, 33, 41, 12, 32, 51, 3, 24, 35, 49, 47, 42, 6, 44, 19, 53, 52, 14, 10, 4, 23, 48, 30, 13, 29, 15, 1, 43, 7, 38, 16, 2, 45, 31, 18, 8, 20, 25, 54, 34, 36, 9, 37]
+    assert suffix_array("aaaaa") == [5, 4, 3, 2, 1, 0]
+
+def test_lms_substrings_are_equal():
     # Test case 1
-    text_1 = "banana"
-    expected_bwt_1 = "annb$aa"
-
-    assert bwt_transform(text_1) == expected_bwt_1, f"Test 1 failed. Expected: {expected_bwt_1}, Got: {bwt_transform(text_1)}"
+    string_1 = b"banana"
+    suffix_types_1 = [S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE]
+    offset_a_1 = 1
+    offset_b_1 = 3
+    assert lms_substrings_are_equal(string_1, suffix_types_1, offset_a_1, offset_b_1) == True
 
     # Test case 2
-    text_2 = "mississippi"
-    expected_bwt_2 = "ipssm$pissii"
+    string_2 = b"banana"
+    suffix_types_2 = [S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE]
+    offset_a_2 = 1
+    offset_b_2 = 6
+    assert lms_substrings_are_equal(string_2, suffix_types_2, offset_a_2, offset_b_2) == False
 
-    assert bwt_transform(text_2, True) == expected_bwt_2, f"Test 2 failed. Expected: {expected_bwt_2}, Got: {bwt_transform(text_2)}"
+    # Test case 3
+    string_3 = b"banana"
+    suffix_types_3 = [S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE]
+    offset_a_3 = 0
+    offset_b_3 = 6
+    assert lms_substrings_are_equal(string_3, suffix_types_3, offset_a_3, offset_b_3) == False
 
-def test_construct_fm_index():
+def test_induce_sort():
     # Test case 1
-    bwt_1 = "annb$aa"
-    expected_fm_index_1 = {
-        'first_column': ['$', 'a', 'a', 'a', 'b', 'n', 'n'],
-        'positions': {'$': 0, 'a': 1, 'b': 4, 'n': 5},
-        'occurrence_table': {
-            '$': [0, 0, 0, 0, 1, 1, 1],
-            'a': [1, 1, 1, 1, 1, 2, 3],
-            'b': [0, 0, 0, 1, 1, 1, 1],
-            'n': [0, 1, 2, 2, 2, 2, 2]
-        }
-    }
-    
-    assert construct_fm_index(bwt_1) == expected_fm_index_1, f"Test 1 failed. Expected: {expected_fm_index_1}, Got: {construct_fm_index(bwt_1)}"
+    encoded_text_1 = b"banana"
+    guessed_suffix_array_1 = [6, -1, -1, -1, -1, 4, 2]
+    bucket_sizes_1 = [0] * ALPHABET_SIZE
+
+    for char in encoded_text_1:
+        bucket_sizes_1[char] += 1
+        
+    suffix_types_1 = [S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE]
+    induce_sort(encoded_text_1, guessed_suffix_array_1, bucket_sizes_1, suffix_types_1)
+    assert guessed_suffix_array_1 == [6, 5, 3, 1, 0, 4, 2]
 
     # Test case 2
-    bwt_2 = "ipssm$pissii"
-    expected_fm_index_2 = {
-        'first_column': ['$', 'i', 'i', 'i', 'i', 'm', 'p', 'p', 's', 's', 's', 's'],
-        'positions': {'$': 0, 'i': 1, 'm': 5, 'p': 6, 's': 8},
-        'occurrence_table': {
-            '$': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-            'i': [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 4],
-            'm': [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-            'p': [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2],
-            's': [0, 0, 1, 2, 2, 2, 2, 2, 3, 4, 4, 4]
-        }
-    }
+    encoded_text_2 = b""
+    guessed_suffix_array_2 = [0]
+    bucket_sizes_2 = [0] * ALPHABET_SIZE
+
+    for char in encoded_text_2:
+        bucket_sizes_2[char] += 1
     
-    assert construct_fm_index(bwt_2) == expected_fm_index_2, f"Test 2 failed. Expected: {expected_fm_index_2}, Got: {construct_fm_index(bwt_2)}"
+    suffix_types_2 = []
+    induce_sort(encoded_text_2, guessed_suffix_array_2, bucket_sizes_2, suffix_types_2)
+    assert  guessed_suffix_array_2 == [0]
 
-def test_search_fm_index():
-    # Test case 1
-    fm_index_1 = {
-        'first_column': ['$', 'a', 'a', 'a', 'b', 'n', 'n'],
-        'positions': {'$': 0, 'a': 1, 'b': 4, 'n': 5},
-        'occurrence_table': {
-            '$': [0, 0, 0, 0, 1, 1, 1],
-            'a': [1, 1, 1, 1, 1, 2, 3],
-            'b': [0, 0, 0, 1, 1, 1, 1],
-            'n': [0, 1, 2, 2, 2, 2, 2]
-        }
-    }
-    pattern_1 = "ana"
-    expected_indices_1 = [3, 4]
+    # # Test case 3
+    encoded_text_3 = b"a!*ba*?"
+    guessed_suffix_array_3 = [7, -1, -1, 2, 6, -1, 4, -1]
+    bucket_sizes_3 = [0] * ALPHABET_SIZE
+
+    for char in encoded_text_3:
+        bucket_sizes_3[char] += 1
     
-    assert search_fm_index(fm_index_1, pattern_1) == expected_indices_1, f"Test 1 failed. Expected: {expected_indices_1}, Got: {search_fm_index(fm_index_1, pattern_1)}"
-
-    # Test case 2
-    fm_index_2 = {
-        'first_column': ['$', 'i', 'i', 'i', 'i', 'm', 'p', 'p', 's', 's', 's', 's'],
-        'positions': {'$': 0, 'i': 1, 'm': 5, 'p': 6, 's': 8},
-        'occurrence_table': {
-            '$': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-            'i': [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 4],
-            'm': [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-            'p': [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2],
-            's': [0, 0, 1, 2, 2, 2, 2, 2, 3, 4, 4, 4]
-        }
-    }
-    pattern_2 = "is"
-    expected_indices_2 = [10, 11]
-
-    assert search_fm_index(fm_index_2, pattern_2) == expected_indices_2, f"Test 2 failed. Expected: {expected_indices_2}, Got: {search_fm_index(fm_index_2, pattern_2)}"
-
-
-
-
-# Execute tests
-# test_bwt_transform()
-# test_construct_fm_index()
-# test_search_fm_index()
-
-
-
-# bwt_transform, construct_fm_index, search_fm_index - added tests
-# count_num_of_characters_in_bwt_string, get_starting_positions_of_characters, create_occurrence_table, indexed_search_using_fm_index
+    suffix_types_3 = [S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE, L_TYPE, S_TYPE]
+    induce_sort(encoded_text_3, guessed_suffix_array_3, bucket_sizes_3, suffix_types_3)
+    assert guessed_suffix_array_3 == [7, 1, 5, 2, 6, 0, 4, 3]
