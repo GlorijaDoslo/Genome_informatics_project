@@ -1,7 +1,16 @@
 from constants import ALPHABET_SIZE, L_TYPE, S_TYPE
 
-# create suffix array using SA IS algorithm
 def suffix_array(text):
+    """
+    Generates the suffix array for the given input text using the SA-IS algorithm.
+
+    Parameters:
+        text (str): The input text for which the suffix array is to be generated.
+
+    Returns:
+        list: The generated suffix array.
+    """
+
     encoded_text = text.encode('utf-8')
     print(encoded_text)
 
@@ -11,6 +20,17 @@ def suffix_array(text):
 
 
 def sa_is_algorithm(encoded_text, alphabet_size):
+    """
+    Implements the SA-IS algorithm to generate the suffix array.
+
+    Parameters:
+        encoded_text (bytes): The encoded text (in UTF-8) for which the suffix array is to be generated.
+        alphabet_size (int): The size of the alphabet (number of unique characters) in the text.
+
+    Returns:
+        list: The suffix offsets representing the suffix array.
+    """
+
     # mark each suffix of the data as S_TYPE or L_TYPE
 
     suffix_types = bytearray(len(encoded_text) + 1)
@@ -70,7 +90,7 @@ def sa_is_algorithm(encoded_text, alphabet_size):
         if not (suffix_offset != 0 and suffix_types[suffix_offset] == S_TYPE and suffix_types[suffix_offset - 1] == L_TYPE):
             continue
 
-        if not lmsSubstringsAreEqual(encoded_text, suffix_types, last_lms_suffix_offset, suffix_offset):
+        if not lms_substrings_are_equal(encoded_text, suffix_types, last_lms_suffix_offset, suffix_offset):
             currentName += 1
 
         last_lms_suffix_offset = suffix_offset
@@ -123,10 +143,23 @@ def sa_is_algorithm(encoded_text, alphabet_size):
     return suffix_offsets
     
 
-def lmsSubstringsAreEqual(string, suffix_types, offset_a, offset_b):
+def lms_substrings_are_equal(string, suffix_types, offset_a, offset_b):
     """
-    Return True if LMS substrings at offset_a and offset_b are equal.
+    Check if two LMS (Longest Minimal Substring) substrings are equal.
+
+    This function compares two LMS substrings starting at offset_a and offset_b
+    respectively in the given string and determines whether they are equal.
+
+    Parameters:
+        string (bytes): The input string.
+        suffix_types (list): A list indicating whether each suffix is of S_TYPE or L_TYPE.
+        offset_a (int): The starting offset of the first LMS substring.
+        offset_b (int): The starting offset of the second LMS substring.
+
+    Returns:
+        bool: True if the LMS substrings are equal, False otherwise.
     """
+    
     # No other substring is equal to the empty suffix.
     if offset_a == len(string) or offset_b == len(string):
         return False
@@ -146,7 +179,24 @@ def lmsSubstringsAreEqual(string, suffix_types, offset_a, offset_b):
 
 
 def induce_sort(encoded_text, guessed_suffix_array, bucket_sizes, suffix_types):
+    """
+    Performs the induce-sort step of the SA-IS algorithm to further sort the suffix array.
 
+    This method refines the suffix array by inducing sorting on the L-type and S-type suffixes.
+
+    Parameters:
+        encoded_text (bytes): The encoded text (in UTF-8) for which the suffix array is generated.
+        guessed_suffix_array (list): The initial guessed suffix array before inducing sorting.
+        bucket_sizes (list): A list containing the sizes of each bucket corresponding to characters in the alphabet.
+        suffix_types (list): A list indicating whether each suffix is of S_TYPE or L_TYPE.
+
+    Returns:
+        None: The suffix array is updated in place.
+
+    Notes:
+        This method modifies the guessed suffix array in place to produce the final sorted suffix array.
+        It operates on L-type and S-type suffixes separately, using bucket pointers to efficiently place them in the correct order.
+    """
     offset_for_tails = 1
     offset_for_heads = 1
     bucket_tails = []

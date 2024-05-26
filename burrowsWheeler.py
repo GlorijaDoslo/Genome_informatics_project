@@ -1,11 +1,35 @@
 
 def bwt(text, s_array):
+    """
+    Constructs the Burrows-Wheeler Transform (BWT) of a given text.
+
+    Parameters:
+        text (str): The input text.
+        s_array (list): The suffix array of the input text.
+
+    Returns:
+        str: The Burrows-Wheeler Transform of the input text.
+    """
+
     text += '$'
     bwt_string = ['$' if elem == 0 else text[elem - 1] for elem in s_array]
     return ''.join(bwt_string)
 
 
 def index_search(bwt_string, pattern, suffix_array, ranks, tots):
+    """
+    Searches for a pattern in the Burrows-Wheeler Transform (BWT) using backward search.
+
+    Parameters:
+        bwt_string (str): The Burrows-Wheeler Transform string.
+        pattern (str): The pattern to search for.
+        suffix_array (list): The suffix array of the original text.
+        ranks (list): The ranks list calculated from BWT.
+        tots (dict): The total counts of characters in BWT.
+
+    Returns:
+        list: Indices of occurrences of the pattern in the original text.
+    """
 
     if not pattern:
         return []
@@ -44,6 +68,16 @@ def index_search(bwt_string, pattern, suffix_array, ranks, tots):
 
 
 def first_column(counts):
+    """
+    Constructs the first column of the Burrows-Wheeler Transform (BWT).
+
+    Parameters:
+        counts (dict): The total counts of characters in BWT.
+
+    Returns:
+        dict: A dictionary containing the first column characters and their indices.
+    """
+
     first = {}
     total_count = 0
     for char, count in sorted(counts.items()):
@@ -53,6 +87,16 @@ def first_column(counts):
 
 
 def rank_bwt(bw):
+    """
+    Calculates the ranks and counts from the Burrows-Wheeler Transform (BWT).
+
+    Parameters:
+        bw (str): The Burrows-Wheeler Transform string.
+
+    Returns:
+        tuple: A tuple containing the ranks list and counts dictionary.
+    """
+    
     counts = dict() 
     ranks = [] 
     for char in bw:
