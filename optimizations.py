@@ -1,15 +1,17 @@
 from burrowsWheeler import first_column
 
-def fm_search_optimized(bwt_string, ranks, tots, first_col_positions, suffix_array, suffix_array_checkpoint=1):
+def fm_search_optimized(bwt_string, pattern, ranks, tots, tally, tally_checkpoint, suffix_array, suffix_array_checkpoint=1):
     """
     Optimized search for a pattern using the found pattern positions in the first column and suffix array
     with checkpoints to get indexes of pattern in original text.
 
     Parameters:
         bwt_string (str): The last column of BWT matrix.
+        pattern (str): Pattern to be found.
         ranks (list): The ranks list calculated from BWT.
         tots (dict): The total counts of characters in BWT.
-        first_col_positions (list): The range of pattern occurrences in first column.
+        tally (dict): Tally matrix.
+        tally_checkpoint (int): Checkpoint where values are found.
         suffix_array (list): Suffix array of the original text.
         suffix_array_checkpoint (int): Checkpoint where values are found.
     
@@ -21,24 +23,43 @@ def fm_search_optimized(bwt_string, ranks, tots, first_col_positions, suffix_arr
         print("Not allowed value for suffix array checkpoint.")
         return -1
     
-    suffix_array_opt = suffix_array_optimized(suffix_array, suffix_array_checkpoint)
     first_col = first_column(tots)
+    first_col_positions = find_pattern_position_in_first(bwt_string, pattern, first_col, tots, tally, tally_checkpoint)
 
     indexes = []
 
     for index in range(first_col_positions[0], first_col_positions[1] + 1):
         if index % suffix_array_checkpoint == 0:
-            indexes.append(suffix_array_opt[index // suffix_array_checkpoint])
+            indexes.append(suffix_array[index // suffix_array_checkpoint])
         else:
             row = index
             count = 0
             while row % suffix_array_checkpoint != 0:
                 count = count + 1
-                s = bwt_string[row]
-                row = first_col[s][0] + ranks[row]
-            indexes.append((suffix_array_opt[row // suffix_array_checkpoint] + count) % len(bwt_string)) 
+                bwt_c = bwt_string[row]
+                row = first_col[bwt_c][0] + ranks[row]
+            indexes.append((suffix_array[row // suffix_array_checkpoint] + count) % len(bwt_string)) 
 
     return indexes
+
+def precalculate_tally_and_suffix_array(bwt_string, tally_checkpoint, suffix_array, suffix_array_checkpoint):
+    """
+    Pre-calculates tally matrix and suffix array.
+
+    Parameters:
+        bwt_string (str): The last column of BWT matrix.
+        tally_checkpoint (int): Checkpoint where values are found.
+        suffix_array (list): Suffix array of the original text.
+        suffix_array_checkpoint (int): Checkpoint where values are found.
+
+    Returns:
+        tally (dict): Created tally matrix.
+        suffix_array_opt (list): Optimized suffix array which is containing only values in checkpoints.
+    """
+
+    tally = create_tally(bwt_string, tally_checkpoint)
+    suffix_array_opt = suffix_array_optimized(suffix_array, suffix_array_checkpoint)
+    return tally, suffix_array_opt
 
 def suffix_array_optimized(suffix_array, suffix_array_checkpoint=1):
     """
@@ -66,14 +87,16 @@ def suffix_array_optimized(suffix_array, suffix_array_checkpoint=1):
 
     return suffix_array_opt
 
-def find_pattern_position_in_first(bwt_string, pattern, tots, tally_checkpoint=1):
+def find_pattern_position_in_first(bwt_string, pattern, first_col, tots, tally, tally_checkpoint=1):
     """
     Finds range where pattern occurs in first column of BWT matrix.
         
     Parameters:
         bwt_string (str): The last column of BWT matrix.
         pattern (str): Pattern to be found.
+        first_col (dict): First column of BWT matrix with positions.
         tots (dict): The total counts of characters in BWT.
+        tally (dict): Tally matrix.
         tally_checkpoint (int): Checkpoint where values are found.
 
     Returns:
@@ -83,14 +106,10 @@ def find_pattern_position_in_first(bwt_string, pattern, tots, tally_checkpoint=1
     if not pattern or tally_checkpoint < 0:
         print("No pattern or invalid value for tally checkpoint (must be >= 1).")
         return []
-    
-    first_col = first_column(tots)
 
     if pattern[-1] not in first_col:
         print("Pattern not found.")
         return []
-
-    tally = create_tally(bwt_string, tally_checkpoint)
     
     lower_index_ex, upper_index_incl = first_col[pattern[-1]]
     pattern_index = len(pattern) - 2
