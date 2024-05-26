@@ -12,7 +12,6 @@ def suffix_array(text):
     """
 
     encoded_text = text.encode('utf-8')
-    print(encoded_text)
 
     sa_array = sa_is_algorithm(encoded_text, ALPHABET_SIZE)
 
