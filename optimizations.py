@@ -19,14 +19,17 @@ def fm_search_optimized(bwt_string, pattern, ranks, tots, tally, tally_checkpoin
         indexes (list): Indexes of the pattern in the original text.
     """
 
+    indexes = []
+
     if suffix_array_checkpoint < 1:
         print("Not allowed value for suffix array checkpoint.")
-        return -1
+        return indexes
     
     first_col = first_column(tots)
     first_col_positions = find_pattern_position_in_first(bwt_string, pattern, first_col, tots, tally, tally_checkpoint)
 
-    indexes = []
+    if first_col_positions == []:
+        return indexes
 
     for index in range(first_col_positions[0], first_col_positions[1] + 1):
         if index % suffix_array_checkpoint == 0:
