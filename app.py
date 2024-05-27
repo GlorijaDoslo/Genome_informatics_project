@@ -58,9 +58,8 @@ for file_name, file_patterns in zip(file_names, ALL_PATTERNS):
     memory_without_optimization = (suffix_array_init_memory) / (1024 * 1024)
     print(f"Memory usage without optimization: {memory_without_optimization} MB")
 
-    # memory_with_optimization
+    # memory usage with optimization
     suffix_array_optimized_memory = asizeof.asizeof(suffix_array_opt)
     tally_memory = asizeof.asizeof(tally)
     memory_with_optimization = (tally_memory + suffix_array_optimized_memory) / (1024 * 1024)
     print(f"Memory usage with optimization: {memory_with_optimization} MB")
-    
