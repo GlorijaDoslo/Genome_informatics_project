@@ -11,3 +11,5 @@ Measure the improvement in memory usage and execution time using 3 sets of test 
 
 Prepare a presentation (Google Slides or PowerPoint) of the initial and optimized algorithms, as well as the results themselves.
 Prepare a video presentation of the project (3 - 5 minutes in duration) which will be available on YouTube or another online video service.
+
+Link to the video presentation can be found [here](https://studentetfbgacrs-my.sharepoint.com/:v:/g/personal/dg233106m_student_etf_bg_ac_rs/ERSL6S6dAANCo_ud9TsR4zABY4pifYK1YpB4d1kNViDyYg?e=DtDniw)
